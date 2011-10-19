@@ -202,12 +202,16 @@ $(function(){
       Buckets.bind('reset', this.addBuckets, this);
       Buckets.bind('all',   this.render, this);
 
-      Buckets.create({name: "Interested"});
-      Buckets.create({name: "Interviewing"});
-      Buckets.create({name: "Received Offer"});
-      Buckets.create({name: "Rejected"});
-
       Companies.fetch();
+      Buckets.fetch();
+
+      if (Buckets.length == 0) {
+        Buckets.create({name: "Interested"});
+        Buckets.create({name: "Waiting"});
+        Buckets.create({name: "Interviewing"});
+        Buckets.create({name: "Received Offer"});
+        Buckets.create({name: "Rejected"});
+      }
     },
 
     addCompany: function(company) {
