@@ -1,5 +1,87 @@
 $(function(){
 
+  // Bucket Model
+  // ----------
+
+  window.Bucket = Backbone.Model.extend({
+    defaults: function() {
+      return {
+      };
+    },
+  });
+
+  // Bucket Collection
+  // ---------------
+
+  window.BucketList = Backbone.Collection.extend({
+    model: Bucket,
+
+    localStorage: new Store("buckets")
+  });
+
+  window.Buckets = new BucketList;
+
+  // Bucket Item View
+  // --------------
+
+  window.BucketView = Backbone.View.extend({
+    tagName:  "li",
+
+    template: _.template($('#bucket-template').html()),
+
+    events: {
+      "click span.bucket-name"    : "edit",
+      "click span.bucket-destroy"   : "clear",
+      "keypress .bucket-input"      : "updateOnEnter"
+    },
+
+    initialize: function() {
+      $(this.el).addClass("bucket-item");
+      this.model.bind('change', this.render, this);
+      this.model.bind('destroy', this.remove, this);
+    },
+
+    render: function() {
+      $(this.el).html(this.template(this.model.toJSON()));
+      this.setText();
+      return this;
+    },
+
+    setText: function() {
+      var name = this.model.get('name');
+      this.$('.bucket-name').text(name);
+      this.input = this.$('.bucket-input');
+      this.input.bind('blur', _.bind(this.close, this)).val(name);
+    },
+
+    toggleFavorite: function() {
+      this.model.toggle();
+    },
+
+    edit: function() {
+      $(this.el).addClass("editing-bucket");
+      this.input.focus();
+    },
+
+    close: function() {
+      this.model.save({text: this.input.val()});
+      $(this.el).removeClass("editing-bucket");
+    },
+
+    updateOnEnter: function(e) {
+      if (e.keyCode == 13) this.close();
+    },
+
+    remove: function() {
+      $(this.el).remove();
+    },
+
+    clear: function() {
+      this.model.destroy();
+    }
+
+  });
+
   // Company Model
   // ----------
 
@@ -41,7 +123,6 @@ $(function(){
   // Company Item View
   // --------------
 
-  // The DOM element for a todo item...
   window.CompanyView = Backbone.View.extend({
     tagName:  "li",
 
@@ -77,13 +158,13 @@ $(function(){
     },
 
     edit: function() {
-      $(this.el).addClass("editing");
+      $(this.el).addClass("editing-company");
       this.input.focus();
     },
 
     close: function() {
       this.model.save({text: this.input.val()});
-      $(this.el).removeClass("editing");
+      $(this.el).removeClass("editing-company");
     },
 
     updateOnEnter: function(e) {
@@ -113,20 +194,38 @@ $(function(){
     initialize: function() {
       this.input    = this.$("#new-company");
 
-      Companies.bind('add',   this.addOne, this);
-      Companies.bind('reset', this.addAll, this);
+      Companies.bind('add',   this.addCompany, this);
+      Companies.bind('reset', this.addCompanies, this);
       Companies.bind('all',   this.render, this);
+
+      Buckets.bind('add',   this.addBucket, this);
+      Buckets.bind('reset', this.addBuckets, this);
+      Buckets.bind('all',   this.render, this);
+
+      Buckets.create({name: "Interested"});
+      Buckets.create({name: "Interviewing"});
+      Buckets.create({name: "Received Offer"});
+      Buckets.create({name: "Rejected"});
 
       Companies.fetch();
     },
 
-    addOne: function(todo) {
-      var view = new CompanyView({model: todo});
+    addCompany: function(company) {
+      var view = new CompanyView({model: company});
       this.$("#company-list").append(view.render().el);
     },
 
-    addAll: function() {
-      Companies.each(this.addOne);
+    addCompanies: function() {
+      Companies.each(this.addCompany);
+    },
+
+    addBucket: function(bucket) {
+      var view = new BucketView({model: bucket});
+      this.$("#bucket-list").append(view.render().el);
+    },
+
+    addBuckets: function() {
+      Buckets.each(this.addBucket);
     },
 
     createOnEnter: function(e) {
@@ -137,7 +236,6 @@ $(function(){
     }
   });
 
-  // Finally, we kick things off by creating the **App**.
   window.App = new AppView;
 
 });

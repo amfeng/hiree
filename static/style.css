@@ -10,7 +10,7 @@ body {
 }
 
 #hireeapp {
-  width: 60%;
+  width: 65%;
   margin: auto;
   padding: 3em;
 
@@ -50,14 +50,13 @@ input#new-company {
 }
 
 input.company-input {
-  display: none;
   font-size: 1em;
   border: 0px;
   margin-left: -2px;
   margin-top: -1px;
 }
 
-ul#company-list {
+ul#company-list, ul#bucket-list {
   list-style: none;
   -webkit-padding-start: 0px;
 }
@@ -66,15 +65,41 @@ li.company-item {
   margin-bottom: 0.5em;
 }
 
+li.bucket-item {
+  display: inline-block;
+  margin: 0.5em;
+  width: 200px;
+  min-height: 200px;
+  background: #eee;
+  padding: 1em;
+}
+
+.bucket-name {
+  font-size: 1.4em;
+  color: #aaa;
+}
+
 span.company-text:hover {
   background: yellow;
 }
 
-li.editing .company-text {
+.edit {
   display: none;
 }
 
-li.editing .company-input {
+li.editing-company .display {
+  display: none;
+}
+
+li.editing-company .edit {
+  display: block;
+}
+
+li.editing-bucket .display {
+  display: none;
+}
+
+li.editing-bucket .edit {
   display: block;
 }
 
