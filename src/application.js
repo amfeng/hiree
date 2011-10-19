@@ -1,21 +1,16 @@
-// Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
   // Company Model
   // ----------
 
-  // Our basic **Company** model has `text`, `order`, and `done` attributes.
   window.Company = Backbone.Model.extend({
-
-    // Default attributes for a todo item.
     defaults: function() {
       return {
         favorite:  false,
-        order: Companys.nextOrder()
+        order: Companies.nextOrder()
       };
     },
 
-    // Toggle the `done` state of this todo item.
     toggle: function() {
       this.save({favorite: !this.get("favorite")});
     }
@@ -25,68 +20,51 @@ $(function(){
   // Company Collection
   // ---------------
 
-  // The collection of todos is backed by *localStorage* instead of a remote
-  // server.
   window.CompanyList = Backbone.Collection.extend({
-
-    // Reference to this collection's model.
     model: Company,
 
-    // Save all of the todo items under the `"todos"` namespace.
     localStorage: new Store("companies"),
 
-    // We keep the Companys in sequential order, despite being saved by unordered
-    // GUID in the database. This generates the next order number for new items.
     nextOrder: function() {
       if (!this.length) return 1;
       return this.last().get('order') + 1;
     },
 
-    // Companys are sorted by their original insertion order.
     comparator: function(todo) {
       return todo.get('order');
     }
 
   });
 
-  // Create our global collection of **Companys**.
-  window.Companys = new CompanyList;
+  window.Companies = new CompanyList;
 
   // Company Item View
   // --------------
 
   // The DOM element for a todo item...
   window.CompanyView = Backbone.View.extend({
-
-    //... is a list tag.
     tagName:  "li",
 
-    // Cache the template function for a single item.
     template: _.template($('#item-template').html()),
 
-    // The DOM events specific to an item.
     events: {
       "click span.company-text"    : "edit",
       "click span.company-destroy"   : "clear",
       "keypress .company-input"      : "updateOnEnter"
     },
 
-    // The CompanyView listens for changes to its model, re-rendering.
     initialize: function() {
       $(this.el).addClass("company-item");
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
     },
 
-    // Re-render the contents of the todo item.
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
       this.setText();
       return this;
     },
 
-    // To avoid XSS (not that it would be harmful in this particular app),
-    // we use `jQuery.text` to set the contents of the todo item.
     setText: function() {
       var text = this.model.get('text');
       this.$('.company-text').text(text);
@@ -94,34 +72,28 @@ $(function(){
       this.input.bind('blur', _.bind(this.close, this)).val(text);
     },
 
-    // Toggle the `"done"` state of the model.
-    toggleDone: function() {
+    toggleFavorite: function() {
       this.model.toggle();
     },
 
-    // Switch this view into `"editing"` mode, displaying the input field.
     edit: function() {
       $(this.el).addClass("editing");
       this.input.focus();
     },
 
-    // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
       this.model.save({text: this.input.val()});
       $(this.el).removeClass("editing");
     },
 
-    // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
     },
 
-    // Remove this view from the DOM.
     remove: function() {
       $(this.el).remove();
     },
 
-    // Remove the item, destroy the model.
     clear: function() {
       this.model.destroy();
     }
@@ -131,58 +103,38 @@ $(function(){
   // The Application
   // ---------------
 
-  // Our overall **AppView** is the top-level piece of UI.
   window.AppView = Backbone.View.extend({
-
-    // Instead of generating a new element, bind to the existing skeleton of
-    // the App already present in the HTML.
     el: $("#hireeapp"),
 
-    // Delegated events for creating new items, and clearing completed ones.
     events: {
       "keypress #new-company":  "createOnEnter",
-      "click .todo-clear a": "clearCompleted"
     },
 
-    // At initialization we bind to the relevant events on the `Companys`
-    // collection, when items are added or changed. Kick things off by
-    // loading any preexisting todos that might be saved in *localStorage*.
     initialize: function() {
       this.input    = this.$("#new-company");
 
-      Companys.bind('add',   this.addOne, this);
-      Companys.bind('reset', this.addAll, this);
-      Companys.bind('all',   this.render, this);
+      Companies.bind('add',   this.addOne, this);
+      Companies.bind('reset', this.addAll, this);
+      Companies.bind('all',   this.render, this);
 
-      Companys.fetch();
+      Companies.fetch();
     },
 
-    // Add a single todo item to the list by creating a view for it, and
-    // appending its element to the `<ul>`.
     addOne: function(todo) {
       var view = new CompanyView({model: todo});
       this.$("#company-list").append(view.render().el);
     },
 
-    // Add all items in the **Companys** collection at once.
     addAll: function() {
-      Companys.each(this.addOne);
+      Companies.each(this.addOne);
     },
 
-    // If you hit return in the main input field, and there is text to save,
-    // create new **Company** model persisting it to *localStorage*.
     createOnEnter: function(e) {
       var text = this.input.val();
       if (!text || e.keyCode != 13) return;
-      Companys.create({text: text});
+      Companies.create({text: text});
       this.input.val('');
-    },
-
-    // Clear all done todo items, destroying their models.
-    clearCompleted: function() {
-      _.each(Companys.done(), function(todo){ todo.destroy(); });
-      return false;
-    },
+    }
   });
 
   // Finally, we kick things off by creating the **App**.
