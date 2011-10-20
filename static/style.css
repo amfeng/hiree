@@ -10,11 +10,12 @@ body {
 }
 
 #hireeapp {
-  width: 65%;
+  width: 60%;
   margin: auto;
   padding: 3em;
 
   background: white;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.05);
 }
 
 #logo {
@@ -49,6 +50,11 @@ input#new-company {
   width: 300px;
 }
 
+#footer {
+  text-align: center;
+  padding: 1em;
+}
+
 .company {
   padding: 0.5em;
   background: white;
@@ -77,7 +83,7 @@ li.company-item {
 
 li.bucket-item {
   margin: 0.5em;
-  width: 200px;
+  width: 175px;
   min-height: 200px;
   background: #eee;
   padding: 1em;
@@ -92,6 +98,7 @@ li.bucket-item {
 .bucket-companies {
   list-style: none;
   -webkit-padding-start: 0px;
+  margin-top: 1em;
 }
 
 span.company-text:hover {
