@@ -105,8 +105,7 @@ $(function(){
       var col = this.model.get("companies"); 
       if (col.length == 0) return;
       col.each(function(company) {
-        var updatedCompany = Companies.getByCid(company.cid);
-        that.addCompany(updatedCompany);
+        that.addCompany(company);
       });
     },
 
