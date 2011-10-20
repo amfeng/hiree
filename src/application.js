@@ -14,6 +14,7 @@ $(function(){
       key: 'companies',
       relatedModel: 'Company',
       collectionType: 'CompanyList',
+      includeInJSON: Backbone.Model.prototype.idAttribute,
       reverseRelation: {
         key: 'bucket'
       }
@@ -78,6 +79,10 @@ $(function(){
 
     close: function() {
       this.model.save({text: this.input.val()});
+      var bucket = this.model.get("bucket");
+      bucket.save();
+      //bucket.get("companies").remove(this.model);
+      //bucket.get("companies").add(this.model);
       $(this.el).removeClass("editing-bucket");
     },
 
@@ -98,10 +103,10 @@ $(function(){
     addCompanies: function(company) {
       var that = this;
       var col = this.model.get("companies"); 
-      console.log(col);
       if (col.length == 0) return;
       col.each(function(company) {
-        that.addCompany(company);
+        var updatedCompany = Companies.getByCid(company.cid);
+        that.addCompany(updatedCompany);
       });
     },
 
@@ -200,6 +205,8 @@ $(function(){
 
     close: function() {
       this.model.save({text: this.input.val()});
+      console.log("saved");
+      console.log(this.model.get("text"));
       $(this.el).removeClass("editing-company");
     },
 
@@ -217,7 +224,7 @@ $(function(){
 
     clear: function() {
       var bucket = this.model.get("bucket");
-      bucket.get("companies").remove(this.model);
+      bucket.get("companies").remove(this.model.id);
       bucket.save();
       this.model.destroy();
     }
@@ -255,13 +262,6 @@ $(function(){
       // localStorage makes empty collections into arrays,
       // so transform them back into empty collections so
       // we don't break on method calls
-      Buckets.each(function(b) {
-        if (b.get("companies").length == 0) {
-          var company = Companies.create({text: "dummy"});
-          b.get("companies").add(company);
-          b.save();
-        }
-      });
 
       $("ul.bucket-companies").sortable({
         dropOnEmpty: true,
@@ -283,8 +283,10 @@ $(function(){
       var text = this.input.val();
       if (!text || e.keyCode != 13) return;
       var company = Companies.create({text: text}); 
-      Buckets.at(1).get("companies").add(company);
-      Buckets.at(1).save();
+      var initialBucket = Buckets.at(0);
+      console.log(initialBucket.get("name"));
+      company.set({"bucket": initialBucket.id });
+      company.get("bucket").save();
       this.input.val('');
     }
   });
