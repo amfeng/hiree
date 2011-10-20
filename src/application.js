@@ -3,11 +3,21 @@ $(function(){
   // Bucket Model
   // ----------
 
-  window.Bucket = Backbone.Model.extend({
+  window.Bucket = Backbone.RelationalModel.extend({
     defaults: function() {
       return {
       };
     },
+
+    relations: [{
+      type: Backbone.HasMany,
+      key: 'companies',
+      relatedModel: 'Company',
+      collectionType: 'CompanyList',
+      reverseRelation: {
+        key: 'bucket'
+      }
+    }]
   });
 
   // Bucket Collection
@@ -36,9 +46,12 @@ $(function(){
     },
 
     initialize: function() {
+      this._companyViews = {};
       $(this.el).addClass("bucket-item");
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
+      this.model.bind('add:companies', this.addCompany, this);
+      this.model.bind('remove:companies', this.removeCompany, this);
     },
 
     render: function() {
@@ -72,6 +85,26 @@ $(function(){
       if (e.keyCode == 13) this.close();
     },
 
+    addCompany: function(company) {
+      var view = new CompanyView({model: company});
+      this._companyViews[company.cid] = view;
+      this.$('.bucket-companies').append(view.render().el);
+    },
+
+    removeCompany: function(company) {
+      this._companyViews[company.cid].remove();
+    },
+
+    addCompanies: function(company) {
+      var that = this;
+      var col = this.model.get("companies"); 
+      if (col.length != 0) {
+        col.each(function(company) {
+          that.addCompany(company);
+        });
+      }
+    },
+
     remove: function() {
       $(this.el).remove();
     },
@@ -85,7 +118,7 @@ $(function(){
   // Company Model
   // ----------
 
-  window.Company = Backbone.Model.extend({
+  window.Company = Backbone.RelationalModel.extend({
     defaults: function() {
       return {
         favorite:  false,
@@ -95,6 +128,9 @@ $(function(){
 
     toggle: function() {
       this.save({favorite: !this.get("favorite")});
+    },
+
+    addToBucket: function(bucket_el) { 
     }
 
   });
@@ -171,11 +207,18 @@ $(function(){
       if (e.keyCode == 13) this.close();
     },
 
+    addToBucket: function(bucket_el) {
+      $(bucket_el).append(this.el);
+    },
+
     remove: function() {
       $(this.el).remove();
     },
 
     clear: function() {
+      var bucket = this.model.get("bucket");
+      bucket.get("companies").remove(this.model);
+      bucket.save();
       this.model.destroy();
     }
 
@@ -194,10 +237,6 @@ $(function(){
     initialize: function() {
       this.input    = this.$("#new-company");
 
-      Companies.bind('add',   this.addCompany, this);
-      Companies.bind('reset', this.addCompanies, this);
-      Companies.bind('all',   this.render, this);
-
       Buckets.bind('add',   this.addBucket, this);
       Buckets.bind('reset', this.addBuckets, this);
       Buckets.bind('all',   this.render, this);
@@ -210,22 +249,13 @@ $(function(){
         Buckets.create({name: "Waiting"});
         Buckets.create({name: "Interviewing"});
         Buckets.create({name: "Received Offer"});
-        Buckets.create({name: "Rejected"});
       }
-    },
-
-    addCompany: function(company) {
-      var view = new CompanyView({model: company});
-      this.$("#company-list").append(view.render().el);
-    },
-
-    addCompanies: function() {
-      Companies.each(this.addCompany);
     },
 
     addBucket: function(bucket) {
       var view = new BucketView({model: bucket});
       this.$("#bucket-list").append(view.render().el);
+      view.addCompanies();
     },
 
     addBuckets: function() {
@@ -235,7 +265,9 @@ $(function(){
     createOnEnter: function(e) {
       var text = this.input.val();
       if (!text || e.keyCode != 13) return;
-      Companies.create({text: text});
+      var company = Companies.create({text: text}); 
+      Buckets.at(0).get("companies").add(company);
+      Buckets.at(0).save();
       this.input.val('');
     }
   });

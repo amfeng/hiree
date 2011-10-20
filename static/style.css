@@ -49,6 +49,16 @@ input#new-company {
   width: 300px;
 }
 
+.company {
+  padding: 0.5em;
+  background: white;
+  border-radius: 3px;
+}
+
+.company-destroy {
+  float: right;
+}
+
 input.company-input {
   font-size: 1em;
   border: 0px;
@@ -66,17 +76,22 @@ li.company-item {
 }
 
 li.bucket-item {
-  display: inline-block;
   margin: 0.5em;
   width: 200px;
   min-height: 200px;
   background: #eee;
   padding: 1em;
+  float: left;
 }
 
 .bucket-name {
   font-size: 1.4em;
   color: #aaa;
+}
+
+.bucket-companies {
+  list-style: none;
+  -webkit-padding-start: 0px;
 }
 
 span.company-text:hover {
@@ -101,5 +116,9 @@ li.editing-bucket .display {
 
 li.editing-bucket .edit {
   display: block;
+}
+
+.clear {
+  clear: both;
 }
 

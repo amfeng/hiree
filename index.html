@@ -5,6 +5,7 @@
     <script src="src/lib/underscore.js"></script>
     <script src="src/lib/backbone.js"></script>
     <script src="src/lib/backbone.localstorage.js"></script>
+    <script src="src/lib/backbone.relational.js"></script>
     <script src="src/application.js"></script>
   </head>
   <body>
@@ -16,12 +17,10 @@
       <div id='add-company'>
         <input id='new-company' placeholder='Add a new company' type='text' />
       </div>
-      <div id='companies'>
-        <ul id='company-list'></ul>
-      </div>
       <div id="buckets">
         <ul id="bucket-list"></ul>
       </div>
+      <div class="clear"></div>
     </div>
   </div>
 
@@ -29,7 +28,7 @@
       <div class="company">
         <div class="display">
           <span class="company-text"></span>
-          <span class="company-destroy"></span>
+          <span class="company-destroy">x</span>
         </div>
         <div class="edit">
           <input class="company-input" type="text" value="" />
@@ -42,6 +41,8 @@
         <div class="display">
           <span class="bucket-name"></span>
           <span class="bucket-destroy"></span>
+          <ul class="bucket-companies">
+          </ul>
         </div>
         <div class="edit">
           <input class="bucket-input" type="text" value="" />
