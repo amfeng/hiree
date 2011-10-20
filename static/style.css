@@ -84,9 +84,9 @@ li.company-item {
 li.bucket-item {
   margin: 0.5em;
   width: 175px;
-  min-height: 200px;
   background: #eee;
   padding: 1em;
+  min-height: 150px;
   float: left;
 }
 
@@ -99,6 +99,7 @@ li.bucket-item {
   list-style: none;
   -webkit-padding-start: 0px;
   margin-top: 1em;
+  min-height: 100px;
 }
 
 span.company-text:hover {

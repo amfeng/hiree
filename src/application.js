@@ -88,7 +88,7 @@ $(function(){
     addCompany: function(company) {
       var view = new CompanyView({model: company});
       this._companyViews[company.cid] = view;
-      this.$('.bucket-companies').append(view.render().el);
+      this.$('ul.bucket-companies').append(view.render().el);
     },
 
     removeCompany: function(company) {
@@ -98,11 +98,11 @@ $(function(){
     addCompanies: function(company) {
       var that = this;
       var col = this.model.get("companies"); 
-      if (col.length != 0) {
-        col.each(function(company) {
-          that.addCompany(company);
-        });
-      }
+      console.log(col);
+      if (col.length == 0) return;
+      col.each(function(company) {
+        that.addCompany(company);
+      });
     },
 
     remove: function() {
@@ -250,6 +250,23 @@ $(function(){
         Buckets.create({name: "Interviewing"});
         Buckets.create({name: "Received Offer"});
       }
+
+      // FIXME: For some reason, re-loading data from
+      // localStorage makes empty collections into arrays,
+      // so transform them back into empty collections so
+      // we don't break on method calls
+      Buckets.each(function(b) {
+        if (b.get("companies").length == 0) {
+          var company = Companies.create({text: "dummy"});
+          b.get("companies").add(company);
+          b.save();
+        }
+      });
+
+      $("ul.bucket-companies").sortable({
+        dropOnEmpty: true,
+        connectWith: "ul.bucket-companies"
+      });
     },
 
     addBucket: function(bucket) {
@@ -266,8 +283,8 @@ $(function(){
       var text = this.input.val();
       if (!text || e.keyCode != 13) return;
       var company = Companies.create({text: text}); 
-      Buckets.at(0).get("companies").add(company);
-      Buckets.at(0).save();
+      Buckets.at(1).get("companies").add(company);
+      Buckets.at(1).save();
       this.input.val('');
     }
   });
