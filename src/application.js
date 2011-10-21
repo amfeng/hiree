@@ -30,7 +30,7 @@ $(function(){
     localStorage: new Store("buckets")
   });
 
-  window.Buckets = new BucketList();
+  window.Buckets = new BucketList;
 
   // Bucket Item View
   // --------------
@@ -127,7 +127,6 @@ $(function(){
     addCompanies: function(company) {
       var that = this;
       var col = this.model.get("companies"); 
-      console.log(col);
       if (col.length == 0) return;
       col.each(function(company) {
         that.addCompany(company);
@@ -151,6 +150,7 @@ $(function(){
     defaults: function() {
       return {
         favorite:  false,
+        order: Companies.nextOrder()
       };
     },
 
@@ -182,8 +182,7 @@ $(function(){
 
   });
 
-  window.c = new Company();
-  window.Companies = new CompanyList();
+  window.Companies = new CompanyList;
 
   // Company Item View
   // --------------
@@ -312,6 +311,6 @@ $(function(){
     }
   });
 
-  window.App = new AppView();
+  window.App = new AppView;
 
 });
