@@ -8,7 +8,7 @@ $(function(){
       return {
       };
     },
-
+    
     relations: [{
       type: Backbone.HasMany,
       key: 'companies',
@@ -30,7 +30,7 @@ $(function(){
     localStorage: new Store("buckets")
   });
 
-  window.Buckets = new BucketList;
+  window.Buckets = new BucketList();
 
   // Bucket Item View
   // --------------
@@ -49,7 +49,7 @@ $(function(){
     initialize: function() {
       this._companyViews = {};
       $(this.el).addClass("bucket-item");
-      this.model.bind('change', this.render, this);
+      this.render();
       this.model.bind('destroy', this.remove, this);
       this.model.bind('add:companies', this.addCompany, this);
       this.model.bind('remove:companies', this.removeCompany, this);
@@ -58,6 +58,27 @@ $(function(){
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
       this.setText();
+
+      var that = this;
+      this.$("ul.bucket-companies").sortable({
+        dropOnEmpty: true,
+        connectWith: "ul.bucket-companies",
+        receive: function(event, ui) {
+          var bucket = that.model;
+          var id = $(ui.item[0]).attr("id"); 
+          var company = Companies.get(id);
+          var oldBucket = company.get("bucket");
+
+          console.log("change bucket");
+          console.log(bucket.get("companies"));
+          company.set({"bucket": bucket.id});//, {silent: true});
+          console.log(bucket.get("companies"));
+          console.log("save");
+          bucket.save();
+          oldBucket.save();
+        }
+      });
+
       return this;
     },
 
@@ -91,18 +112,22 @@ $(function(){
     },
 
     addCompany: function(company) {
+      console.log("add to " + this.model.id);
       var view = new CompanyView({model: company});
       this._companyViews[company.cid] = view;
       this.$('ul.bucket-companies').append(view.render().el);
     },
 
     removeCompany: function(company) {
-      this._companyViews[company.cid].remove();
+      console.log("remove from " + this.model.id);
+      var company = this._companyViews[company.cid];
+      company.remove();
     },
 
     addCompanies: function(company) {
       var that = this;
       var col = this.model.get("companies"); 
+      console.log(col);
       if (col.length == 0) return;
       col.each(function(company) {
         that.addCompany(company);
@@ -126,7 +151,6 @@ $(function(){
     defaults: function() {
       return {
         favorite:  false,
-        order: Companies.nextOrder()
       };
     },
 
@@ -158,7 +182,8 @@ $(function(){
 
   });
 
-  window.Companies = new CompanyList;
+  window.c = new Company();
+  window.Companies = new CompanyList();
 
   // Company Item View
   // --------------
@@ -176,6 +201,7 @@ $(function(){
 
     initialize: function() {
       $(this.el).addClass("company-item");
+      $(this.el).attr("id", this.model.id);
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
     },
@@ -245,7 +271,6 @@ $(function(){
 
       Buckets.bind('add',   this.addBucket, this);
       Buckets.bind('reset', this.addBuckets, this);
-      Buckets.bind('all',   this.render, this);
 
       Companies.fetch();
       Buckets.fetch();
@@ -262,10 +287,6 @@ $(function(){
       // so transform them back into empty collections so
       // we don't break on method calls
 
-      $("ul.bucket-companies").sortable({
-        dropOnEmpty: true,
-        connectWith: "ul.bucket-companies"
-      });
     },
 
     addBucket: function(bucket) {
@@ -283,13 +304,14 @@ $(function(){
       if (!text || e.keyCode != 13) return;
       var company = Companies.create({text: text}); 
       var initialBucket = Buckets.at(0);
-      console.log(initialBucket.get("name"));
+      console.log("setting bucket");
       company.set({"bucket": initialBucket.id });
+      console.log("saving");
       company.get("bucket").save();
       this.input.val('');
     }
   });
 
-  window.App = new AppView;
+  window.App = new AppView();
 
 });
