@@ -3,22 +3,38 @@ $(function(){
   // Bucket Model
   // ----------
 
-  window.Bucket = Backbone.RelationalModel.extend({
+  window.Bucket = Backbone.Model.extend({
     defaults: function() {
       return {
+        companies: []
       };
     },
-    
-    relations: [{
-      type: Backbone.HasMany,
-      key: 'companies',
-      relatedModel: 'Company',
-      collectionType: 'CompanyList',
-      includeInJSON: Backbone.Model.prototype.idAttribute,
-      reverseRelation: {
-        key: 'bucket'
+
+    addCompany: function(companyId) {
+      var arr = this.get("companies");
+      arr.push(companyId);
+      this.set({"companies": arr}, {silent: true});
+      this.save();
+      this.trigger("add:companies", Companies.get(companyId));
+    },
+
+    removeCompany: function(companyId) {
+      var arr = this.get("companies");
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == companyId) { 
+          arr.splice(i, 1); 
+          this.set({"companies": arr}, {silent: true});
+          this.save();
+          this.trigger("remove:companies", Companies.get(companyId));
+        }
       }
-    }]
+    },
+
+    getCompanies: function() {
+      return _.map(this.get("companies"), function(companyId) {
+        return Companies.get(companyId);
+      });
+    }
   });
 
   // Bucket Collection
@@ -67,16 +83,13 @@ $(function(){
           var bucket = that.model;
           var id = $(ui.item[0]).attr("id"); 
           var company = Companies.get(id);
-          var oldBucket = company.get("bucket");
+          var oldBucket = company.getBucket();
 
-          console.log("change bucket");
-          console.log(bucket.get("companies"));
-          company.set({"bucket": bucket.id});//, {silent: true});
-          console.log(bucket.get("companies"));
-          console.log("save");
-          //company.save();
-          bucket.save();
-          oldBucket.save();
+          console.log(company.getBucket());
+          company.setBucket(bucket.id);
+          oldBucket.removeCompany(company.id);
+          bucket.addCompany(company.id);
+          console.log(company.getBucket());
         }
       });
 
@@ -101,10 +114,6 @@ $(function(){
 
     close: function() {
       this.model.save({text: this.input.val()});
-      var bucket = this.model.get("bucket");
-      bucket.save();
-      //bucket.get("companies").remove(this.model);
-      //bucket.get("companies").add(this.model);
       $(this.el).removeClass("editing-bucket");
     },
 
@@ -127,9 +136,9 @@ $(function(){
 
     addCompanies: function(company) {
       var that = this;
-      var col = this.model.get("companies"); 
+      var col = this.model.getCompanies(); 
       if (col.length == 0) return;
-      col.each(function(company) {
+      _.each(col, function(company) {
         that.addCompany(company);
       });
     },
@@ -147,10 +156,11 @@ $(function(){
   // Company Model
   // ----------
 
-  window.Company = Backbone.RelationalModel.extend({
+  window.Company = Backbone.Model.extend({
     defaults: function() {
       return {
         favorite:  false,
+        bucket: 0,
         order: Companies.nextOrder()
       };
     },
@@ -159,9 +169,13 @@ $(function(){
       this.save({favorite: !this.get("favorite")});
     },
 
-    addToBucket: function(bucket_el) { 
-    }
+    getBucket: function() {
+      return Buckets.get(this.get("bucket"));
+    },
 
+    setBucket: function(bucketId) {
+      this.save({bucket: bucketId}, {silent: true});
+    }
   });
 
   // Company Collection
@@ -248,9 +262,8 @@ $(function(){
     },
 
     clear: function() {
-      var bucket = this.model.get("bucket");
-      bucket.get("companies").remove(this.model.id);
-      bucket.save();
+      var bucket = this.model.getBucket();
+      bucket.removeCompany(this.model.id);
       this.model.destroy();
     }
 
@@ -302,13 +315,10 @@ $(function(){
     createOnEnter: function(e) {
       var text = this.input.val();
       if (!text || e.keyCode != 13) return;
-      var company = Companies.create({text: text}); 
       var initialBucket = Buckets.at(0);
-      console.log("setting bucket");
-      company.set({"bucket": initialBucket.id });
-      console.log("saving");
-      console.log(company.get("bucket").get("companies"));
-      company.get("bucket").save();
+      var company = Companies.create({text: text}); 
+      company.setBucket(initialBucket.id);
+      initialBucket.addCompany(company.id);
       this.input.val('');
     }
   });
