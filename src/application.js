@@ -85,11 +85,9 @@ $(function(){
           var company = Companies.get(id);
           var oldBucket = company.getBucket();
 
-          console.log(company.getBucket());
           company.setBucket(bucket.id);
           oldBucket.removeCompany(company.id);
           bucket.addCompany(company.id);
-          console.log(company.getBucket());
         }
       });
 
@@ -122,14 +120,12 @@ $(function(){
     },
 
     addCompany: function(company) {
-      console.log("add to " + this.model.id);
       var view = new CompanyView({model: company});
       this._companyViews[company.cid] = view;
       this.$('ul.bucket-companies').append(view.render().el);
     },
 
     removeCompany: function(company) {
-      console.log("remove from " + this.model.id);
       var company = this._companyViews[company.cid];
       company.remove();
     },
@@ -244,8 +240,6 @@ $(function(){
 
     close: function() {
       this.model.save({text: this.input.val()});
-      console.log("saved");
-      console.log(this.model.get("text"));
       $(this.el).removeClass("editing-company");
     },
 
