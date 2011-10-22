@@ -156,6 +156,7 @@ $(function(){
     defaults: function() {
       return {
         favorite:  false,
+        mood: 0,
         bucket: 0,
         order: Companies.nextOrder()
       };
@@ -206,6 +207,7 @@ $(function(){
     events: {
       "click span.company-text"    : "edit",
       "click span.company-destroy"   : "clear",
+      "click span.company-mood"   : "changeMood",
       "keypress .company-input"      : "updateOnEnter"
     },
 
@@ -214,11 +216,13 @@ $(function(){
       $(this.el).attr("id", this.model.id);
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
+
     },
 
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
       this.setText();
+      this.setMood();
       return this;
     },
 
@@ -249,6 +253,32 @@ $(function(){
 
     addToBucket: function(bucket_el) {
       $(bucket_el).append(this.el);
+    },
+
+    changeMood: function() {
+      this.model.save({mood: (this.model.get("mood") + 1) % 3});
+      this.setMood();
+    },
+
+    setMood: function() {
+      var newMood = this.model.get("mood");
+      console.log(newMood);
+      var moodElement = this.$('.mood');
+      switch(newMood) {
+        case 0: // Neutral
+          moodElement.removeClass("sad");
+          break;
+        case 1: // Happy
+          moodElement.addClass("happy");
+          break;
+        case 2: // Sad
+          moodElement.removeClass("happy");
+          moodElement.addClass("sad");
+          break;
+      }
+
+      console.log(moodElement);
+
     },
 
     remove: function() {

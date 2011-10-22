@@ -61,8 +61,50 @@ input#new-company {
   border-radius: 3px;
 }
 
+.company-mood {
+}
+
+.mood {
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  background: url("images/icons/moods.png");
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.mood:hover {
+  opacity: 0.8;
+}
+
+.sad {
+  background-position: 0px 15px;
+}
+
+.happy {
+  background-position: 0px 30px;
+}
+
+.smile {
+  background-position: 0px 45px;
+}
+
+
 .company-destroy {
   float: right;
+  width: 12px;
+  height: 12px;
+  background: url('images/icons/close.png');
+  position: relative;
+  top: 3px;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.company-destroy:hover {
+  opacity: 1;
 }
 
 input.company-input {
@@ -70,6 +112,7 @@ input.company-input {
   border: 0px;
   margin-left: -2px;
   margin-top: -1px;
+  width: 80%;
 }
 
 ul#company-list, ul#bucket-list {
