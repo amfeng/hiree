@@ -145,6 +145,14 @@ li.bucket-item {
   min-height: 100px;
 }
 
+span.company-text {
+  display: inline-block;
+  white-space: nowrap;
+  width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 span.company-text:hover {
   background: yellow;
 }
