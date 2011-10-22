@@ -9,6 +9,14 @@ body {
   font-weight: lighter;
 }
 
+a {
+  color: #9F9393;
+}
+
+a:hover {
+  color: #8C8080;
+}
+
 #hireeapp {
   width: 60%;
   margin: auto;
@@ -53,6 +61,7 @@ input#new-company {
 #footer {
   text-align: center;
   padding: 1em;
+  font-size: 0.9em;
 }
 
 .company {
