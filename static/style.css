@@ -116,12 +116,17 @@ input#new-company {
   opacity: 1;
 }
 
-input.company-input {
+input.company-input, input.bucket-input {
   font-size: 1em;
   border: 0px;
   margin-left: -2px;
   margin-top: -1px;
   width: 80%;
+}
+
+input.bucket-input {
+  background: #eee;
+  font-size: 1.4em;
 }
 
 ul#company-list, ul#bucket-list {
@@ -166,7 +171,7 @@ span.company-text:hover {
   background: yellow;
 }
 
-.edit {
+.edit, .editing-name {
   display: none;
 }
 
@@ -178,11 +183,11 @@ li.editing-company .edit {
   display: block;
 }
 
-li.editing-bucket .display {
+li.editing-bucket .bucket-name {
   display: none;
 }
 
-li.editing-bucket .edit {
+li.editing-bucket .editing-name {
   display: block;
 }
 

@@ -66,6 +66,7 @@ $(function(){
       this._companyViews = {};
       $(this.el).addClass("bucket-item");
       this.render();
+      this.model.bind('change', this.setText, this);
       this.model.bind('destroy', this.remove, this);
       this.model.bind('add:companies', this.addCompany, this);
       this.model.bind('remove:companies', this.removeCompany, this);
@@ -111,7 +112,7 @@ $(function(){
     },
 
     close: function() {
-      this.model.save({text: this.input.val()});
+      this.model.save({name: this.input.val()});
       $(this.el).removeClass("editing-bucket");
     },
 
@@ -262,7 +263,6 @@ $(function(){
 
     setMood: function() {
       var newMood = this.model.get("mood");
-      console.log(newMood);
       var moodElement = this.$('.mood');
       switch(newMood) {
         case 0: // Neutral
@@ -276,9 +276,6 @@ $(function(){
           moodElement.addClass("sad");
           break;
       }
-
-      console.log(moodElement);
-
     },
 
     remove: function() {
@@ -318,12 +315,6 @@ $(function(){
         Buckets.create({name: "Interviewing"});
         Buckets.create({name: "Received Offer"});
       }
-
-      // FIXME: For some reason, re-loading data from
-      // localStorage makes empty collections into arrays,
-      // so transform them back into empty collections so
-      // we don't break on method calls
-
     },
 
     addBucket: function(bucket) {
