@@ -116,12 +116,27 @@ input#new-company {
   opacity: 1;
 }
 
+.bucket-destroy {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  width: 20px;
+  height: 20px;
+  background: url('images/icons/close_lg.png');
+  opacity: 0.05;
+  cursor: pointer;
+}
+
+.bucket-destroy:hover {
+  opacity: 0.15;
+}
+
 input.company-input, input.bucket-input {
   font-size: 1em;
   border: 0px;
   margin-left: -2px;
   margin-top: -1px;
-  width: 80%;
+  width: 90%;
 }
 
 input.bucket-input {
@@ -138,13 +153,41 @@ li.company-item {
   margin-bottom: 0.5em;
 }
 
-li.bucket-item {
+.bucket-item {
   margin: 0.5em;
   width: 175px;
-  background: #eee;
   padding: 1em;
   min-height: 150px;
   float: left;
+}
+
+li.bucket-item {
+  background: #eee;
+}
+
+#new-bucket-item {
+  border: 2px dashed #eee;
+}
+
+#new-bucket-item:hover {
+  background: #f9f9f9;
+}
+
+input#new-bucket {
+  border: 0px;
+  border-radius: 3px;
+  padding: 5px;
+  font-size: 1.5em;
+  text-align: center;
+  width: 160px;
+}
+
+#new-bucket-item:hover input#new-bucket, input#new-bucket:focus {
+  border: 1px solid #ddd;
+}
+
+.bucket {
+  position: relative;
 }
 
 .bucket-name {
@@ -159,7 +202,7 @@ li.bucket-item {
   min-height: 100px;
 }
 
-span.company-text {
+span.company-text, span.bucket-name {
   display: inline-block;
   white-space: nowrap;
   width: 70%;
@@ -167,8 +210,12 @@ span.company-text {
   text-overflow: ellipsis;
 }
 
+span.bucket-name {
+  width: 90%;
+}
+
 span.company-text:hover {
-  background: yellow;
+  background: #FFFFD1;
 }
 
 .edit, .editing-name {

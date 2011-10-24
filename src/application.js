@@ -297,11 +297,13 @@ $(function(){
     el: $("#hireeapp"),
 
     events: {
-      "keypress #new-company":  "createOnEnter",
+      "keypress #new-company":  "createCompanyOnEnter",
+      "keypress #new-bucket":  "createBucketOnEnter",
     },
 
     initialize: function() {
-      this.input    = this.$("#new-company");
+      this.companyInput    = this.$("#new-company");
+      this.bucketInput = this.$("#new-bucket");
 
       Buckets.bind('add',   this.addBucket, this);
       Buckets.bind('reset', this.addBuckets, this);
@@ -327,15 +329,24 @@ $(function(){
       Buckets.each(this.addBucket);
     },
 
-    createOnEnter: function(e) {
-      var text = this.input.val();
+    createCompanyOnEnter: function(e) {
+      var text = this.companyInput.val();
       if (!text || e.keyCode != 13) return;
       var initialBucket = Buckets.at(0);
       var company = Companies.create({text: text}); 
       company.setBucket(initialBucket.id);
       initialBucket.addCompany(company.id);
-      this.input.val('');
+      this.companyInput.val('');
+    },
+
+    createBucketOnEnter: function(e) {
+      var text = this.bucketInput.val();
+      if (!text || e.keyCode != 13) return;
+      console.log("creating bucket");
+      Buckets.create({name: text});
+      this.bucketInput.val('');
     }
+
   });
 
   window.App = new AppView();
