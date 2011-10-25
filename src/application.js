@@ -299,6 +299,7 @@ $(function(){
     events: {
       "keypress #new-company":  "createCompanyOnEnter",
       "keypress #new-bucket":  "createBucketOnEnter",
+      "click #data-backup":  "backup"
     },
 
     initialize: function() {
@@ -345,6 +346,17 @@ $(function(){
       console.log("creating bucket");
       Buckets.create({name: text});
       this.bucketInput.val('');
+    },
+
+    backup: function(e) {
+      var buckets = localStorage.getItem("buckets");
+      var companies = localStorage.getItem("companies");
+      var backup = {
+        buckets: JSON.parse(buckets),
+        companies: JSON.parse(companies)
+      };
+      uriContent = "data:application/octet-stream;filename=hiree.backup," + encodeURIComponent(JSON.stringify(backup));
+      newWindow=window.open(uriContent, 'Hiree Backup');
     }
 
   });

@@ -123,12 +123,12 @@ input#new-company {
   width: 20px;
   height: 20px;
   background: url('images/icons/close_lg.png');
-  opacity: 0.05;
+  opacity: 0.1;
   cursor: pointer;
 }
 
 .bucket-destroy:hover {
-  opacity: 0.15;
+  opacity: 0.2;
 }
 
 input.company-input, input.bucket-input {
@@ -236,6 +236,11 @@ li.editing-bucket .bucket-name {
 
 li.editing-bucket .editing-name {
   display: block;
+}
+
+#backup-note {
+  margin-top: 1em;
+  padding: 0.5em
 }
 
 .clear {
